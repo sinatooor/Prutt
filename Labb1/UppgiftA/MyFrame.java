@@ -33,7 +33,7 @@ public class MyFrame extends JFrame implements ActionListener{
     }
 
     public static void main(String[] u) {
-        MyFrame window = new MyFrame("Malte Bandmann");
+        MyFrame window = new MyFrame("Sina Rajaeeian & Malte Bandmann");
     }
     
 }
