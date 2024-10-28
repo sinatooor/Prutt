@@ -22,5 +22,4 @@ public class MyButton extends JButton {
         this.setText(labels[state % this.labels.length]);
     }
 
-
 }

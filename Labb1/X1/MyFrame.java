@@ -1,7 +1,8 @@
 // Imports 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class MyFrame extends JFrame implements ActionListener{
 
@@ -18,8 +19,8 @@ public class MyFrame extends JFrame implements ActionListener{
         this.buttons = new MyButton[n];
         for (int i=0; i<n; i++) {
             this.buttons[i] = new MyButton(new String[]{labels[2*i+1], labels[2*i+2]});
-            this.add(this.buttons[i]);
             this.buttons[i].addActionListener(this);
+            this.add(this.buttons[i]);
         }
 
         this.setLayout(new FlowLayout());
@@ -28,8 +29,11 @@ public class MyFrame extends JFrame implements ActionListener{
     }
 
     public void actionPerformed(ActionEvent ae) {
-        for (MyButton button : buttons) {
-            button.toogleState();
+        Object clickedButton = ae.getSource();
+        for (MyButton button : this.buttons) {
+            if (button != clickedButton) {
+                button.toogleState();
+            }
         }
     } 
 
