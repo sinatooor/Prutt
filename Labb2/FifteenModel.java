@@ -4,25 +4,26 @@ import java.util.Collections;
 
 public class FifteenModel implements Boardgame{
     
-    private int[][] board = new int[4][4];
+    private int[][] board;
     private int[] emptyPosition = new int[2];
     private boolean lastMoveDone;
     private String lastMoveMessage;
+    private int size = 4;
 
     // Konstruktor
     public FifteenModel() {
-
+        board = new int[this.size][this.size];
         // konstruera spelplanen
-        // slumpar en lista med 16 siffror
+        // slumpar en lista med n^2 siffror
         ArrayList<Integer> randomList = new ArrayList<>();
-        for (Integer i = 0; i<16; i++) {
+        for (Integer i = 0; i<Math.pow(this.size, 2) ; i++) {
             randomList.add(i);
         }
         Collections.shuffle(randomList);
 
         int index = 0;
-        for (int i=0; i<4; i++) {
-            for (int j=0; j<4; j++) {
+        for (int i=0; i<this.size; i++) {
+            for (int j=0; j<this.size; j++) {
                 this.board[i][j] = randomList.get(index);
                 if (this.board[i][j] == 0) {
                     emptyPosition[0] = i;
@@ -36,7 +37,7 @@ public class FifteenModel implements Boardgame{
     }
 
     public boolean move(int x, int y) {
-        boolean insideBoard = (x >= 0) && (x <= 3) && (y >= 0) && (y <= 3);
+        boolean insideBoard = (x >= 0) && (x < this.size) && (y >= 0) && (y < this.size);
         boolean moveablePeace = ((x == this.emptyPosition[0] + 1 || x == this.emptyPosition[0] - 1) && (y == this.emptyPosition[1])) ||
                                 ((y == this.emptyPosition[1] + 1 || y == this.emptyPosition[1] - 1) && (x == this.emptyPosition[0]));
         if (insideBoard == false) {
