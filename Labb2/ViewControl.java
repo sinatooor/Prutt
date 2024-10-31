@@ -68,8 +68,11 @@ public class ViewControl extends JFrame implements ActionListener{
         //int n = 4;
         //Boardgame model = new FifteenModel();
 
-        int n = 6;
-        Boardgame model = new MockObject();
+        //int n = 6;
+        //Boardgame model = new MockObject();
+
+        int n = 3;
+        Boardgame model = new TicTacToeModel();
 
         ViewControl window = new ViewControl(model, n);
     }
