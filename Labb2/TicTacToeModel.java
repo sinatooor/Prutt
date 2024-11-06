@@ -21,7 +21,8 @@ public class TicTacToeModel implements Boardgame{
 
     }
 
-    /*slkacjfljasdlfjlsakjdf*/
+
+
     public boolean move(int x, int y) {
         boolean isInsideboard = (x>=0 && x<=2 && y>=0 && y<=2);
         
