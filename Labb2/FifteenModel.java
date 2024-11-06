@@ -5,6 +5,7 @@ import java.util.Collections;
 public class FifteenModel implements Boardgame{
     
     private int[][] board;
+    // matrix for the game
     private int[] emptyPosition = new int[2];
     private boolean lastMoveDone;
     private String lastMoveMessage;
@@ -24,7 +25,7 @@ public class FifteenModel implements Boardgame{
         int index = 0;
         for (int i=0; i<this.size; i++) {
             for (int j=0; j<this.size; j++) {
-                this.board[i][j] = randomList.get(index);
+                this.board[i][j] = randomList.get(index); //adds randomlist to matrix 
                 if (this.board[i][j] == 0) {
                     emptyPosition[0] = i;
                     emptyPosition[1] = j;
@@ -40,6 +41,7 @@ public class FifteenModel implements Boardgame{
         boolean insideBoard = (x >= 0) && (x < this.size) && (y >= 0) && (y < this.size);
         boolean moveablePeace = ((x == this.emptyPosition[0] + 1 || x == this.emptyPosition[0] - 1) && (y == this.emptyPosition[1])) ||
                                 ((y == this.emptyPosition[1] + 1 || y == this.emptyPosition[1] - 1) && (x == this.emptyPosition[0]));
+                                // om x är samma och y varierar och om y är samma och x ändras
         if (insideBoard == false) {
             this.lastMoveDone = false;
             this.lastMoveMessage = "Please choose a position within the board!";
@@ -50,8 +52,8 @@ public class FifteenModel implements Boardgame{
             this.lastMoveDone = true;
             this.lastMoveMessage = "OK";
             // make the move
-            this.board[this.emptyPosition[0]][this.emptyPosition[1]] = this.board[x][y];
-            this.board[x][y] = 0;
+            this.board[this.emptyPosition[0]][this.emptyPosition[1]] = this.board[x][y]; //rutan med noll omvandlas till den valda rutan
+            this.board[x][y] = 0; //den valda blir noll
             this.emptyPosition[0] = x;
             this.emptyPosition[1] = y;
         }
@@ -64,7 +66,7 @@ public class FifteenModel implements Boardgame{
             s = "  ";
         } else {
             if (this.board[x][y] <= 9) {
-                s = " " + String.valueOf(this.board[x][y]);
+                s = " " + String.valueOf(this.board[x][y]); //byter till string 
             } else {
                 s = String.valueOf(this.board[x][y]);
             }

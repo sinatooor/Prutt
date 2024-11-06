@@ -83,7 +83,7 @@ public class TicTacToeModel implements Boardgame{
                 this.nextTurn();
                 this.lastMoveDone = true;
                 this.lastMoveMessage = "It is " + symbols[turn] + "'s turn.";
-                this.movePiece = null;
+                this.movePiece = null; //nullar inför nästa runda 
 
             }
         }

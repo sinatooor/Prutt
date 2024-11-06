@@ -1,5 +1,5 @@
 /**
- * Boardgame
+ * Boardgame interface
  */
 public interface Boardgame {
 

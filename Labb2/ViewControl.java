@@ -13,7 +13,7 @@ public class ViewControl extends JFrame implements ActionListener{
     private int size;
     private Square[][] board;        // Square är subklass till JButton
     private JTextField mess = new JTextField();  // JLabel funkar också
-    private JLabel buttonBoard = new JLabel();
+    private JLabel buttonBoard = new JLabel(); // används som en behållare
 
     ViewControl(Boardgame model, int n) {
         super("Boardgame");
@@ -21,7 +21,7 @@ public class ViewControl extends JFrame implements ActionListener{
         setSize(500, 600);
         setLayout(new BorderLayout());
 
-        this.game = model;
+        this.game = model; 
         this.size = n;
         this.board = new Square[this.size][this.size];
 
@@ -30,10 +30,12 @@ public class ViewControl extends JFrame implements ActionListener{
 
         this.buttonBoard.setLayout(new GridLayout(this.size, this.size));
 
+
+        //lägger till knappar till frame
         for (int i=0; i<this.size; i++) {
             for (int j=0; j<this.size; j++) {
                 board[i][j] = new Square(i, j);
-                board[i][j].addActionListener(this);
+                board[i][j].addActionListener(this); // lägger till ActionListener
                 this.buttonBoard.add(board[i][j], i, j);
             }
         }
@@ -47,7 +49,7 @@ public class ViewControl extends JFrame implements ActionListener{
 
     }
 
-    public void setButtonTexts() {
+    private void setButtonTexts() {
         for (int i=0; i<this.size; i++) {
             for (int j=0; j<this.size; j++) {
                 this.board[i][j].setText(game.getStatus(i, j));
@@ -56,8 +58,8 @@ public class ViewControl extends JFrame implements ActionListener{
     }
 
     public void actionPerformed(ActionEvent ae) {
-        Square clickedButton = (Square) ae.getSource();
-        this.game.move(clickedButton.coordinates[0], clickedButton.coordinates[1]);
+        Square clickedButton = (Square) ae.getSource(); //vad är det som har valts och byter till Sqaure
+        this.game.move(clickedButton.coordinates[0], clickedButton.coordinates[1]); 
         this.mess.setText(game.getMessage());
 
         this.setButtonTexts();
