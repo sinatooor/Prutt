@@ -90,6 +90,7 @@ public class TicTacToeModel implements Boardgame{
         }
     }
 
+
     private void nextTurn() {
         if (this.turn == 1) {
             this.round++;
