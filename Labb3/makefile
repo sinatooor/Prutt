@@ -8,3 +8,7 @@ run: GameClient
 
 clean:
 	rm *.class
+
+
+#Kör med command "make" för att kompilera
+#och "make run" för att starta
