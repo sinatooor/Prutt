@@ -14,7 +14,7 @@ public class RPSModel {
             out = new PrintWriter(socket.getOutputStream(), true);
 
             // Skicka ditt namn till servern
-            out.println("Spelare");
+            out.println("Malte&Sina");
             out.flush();
 
             // Läs serverns hälsning
