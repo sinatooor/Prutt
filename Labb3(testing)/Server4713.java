@@ -11,8 +11,7 @@ public class Server4713 {
 	try {
 	    ServerSocket sock = new ServerSocket(4713,100);
 	    while (true) 
-		new ClientHandler(sock.accept()).start(); ///It’s a blocking method, it makes the program pause and wait until a client connects to the server, then it returns a socket
-		
+		new ClientHandler(sock.accept()).start();
 	}
 	catch(IOException e)
 	    {System.err.println(e);

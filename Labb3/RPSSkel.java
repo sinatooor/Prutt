@@ -1,53 +1,66 @@
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import javax.swing.*;
+import java.net.*;
+import java.io.*;
+import java.util.*;
 
 public class RPSSkel extends JFrame {
-    private Gameboard playerBoard;
-    private Gameboard serverBoard;
-    private GameClient client;
+    Gameboard myboard, computersboard;
+    JButton closebutton;
+    RPSController controller;
 
-    public RPSSkel(GameClient client) {
-        this.client = client;
-        setTitle("Rock Paper Scissors");
-        setLayout(new BorderLayout());
+    public RPSSkel(RPSController controller) {
+        this.controller = controller;
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        closebutton = new JButton("Avsluta");
+        closebutton.addActionListener(new CloseListener());
 
-        playerBoard = new Gameboard("Player");
-        serverBoard = new Gameboard("Server");
+        // Skapa spelplaner
+        myboard = new Gameboard("Du", new ButtonListener());
+        computersboard = new Gameboard("Datorn");
 
-        add(playerBoard, BorderLayout.WEST);
-        add(serverBoard, BorderLayout.EAST);
+        JPanel boards = new JPanel();
+        boards.setLayout(new GridLayout(1, 2));
+        boards.add(myboard);
+        boards.add(computersboard);
 
-        // Add listeners to player buttons
-        playerBoard.getRockButton().addActionListener(new MoveListener("STEN"));
-        playerBoard.getPaperButton().addActionListener(new MoveListener("PÅSE"));
-        playerBoard.getScissorsButton().addActionListener(new MoveListener("SAX"));
-
-        setSize(500, 300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        add(boards, BorderLayout.CENTER);
+        add(closebutton, BorderLayout.SOUTH);
+        setSize(350, 650);
         setVisible(true);
     }
 
-    // Inner class for handling move events
-    private class MoveListener implements ActionListener {
-        private String move;
+    // Uppdatera vyn baserat på modellens data
+    public void updateView(String playerMove, String serverMove, String result) {
+        myboard.markPlayed(playerMove);
+        myboard.setUpper(playerMove);
 
-        public MoveListener(String move) {
-            this.move = move;
-        }
+        computersboard.markPlayed(serverMove);
+        computersboard.setUpper(serverMove);
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String serverMove = client.sendMove(move);
-            playerBoard.updateMove(move);
-            serverBoard.updateMove(serverMove);
-            updateResult(move, serverMove);  // Decide winner and update UI
+        myboard.setLower(result);
+        computersboard.setLower(result);
+
+        if (result.equals("Du vann!")) {
+            myboard.wins();
+        } else if (result.equals("Du förlorade!")) {
+            computersboard.wins();
         }
     }
 
-    private void updateResult(String playerMove, String serverMove) {
-        // Calculate the result (win/lose/draw) and update player and server boards
-        // Example logic to be added here
+    // Lyssnare för spelknapparna
+    class ButtonListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            controller.handlePlayerMove(e.getActionCommand());
+        }
+    }
+
+    // Lyssnare för Avsluta-knappen
+    class CloseListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            controller.closeConnection();
+            System.exit(0);
+        }
     }
 }
