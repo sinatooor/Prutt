@@ -1,8 +1,0 @@
-/rock_paper_scissors_client
-│
-├── GameClient.java             // Main class to run the game and manage server connection
-├── Gameboard.java              // Class representing the game board
-├── RPSSkel.java                // Skeleton for the GUI layout and structure
-├── ServerHandler.java          // Manages interaction with the server
-├── Listener.java               // Event listeners for buttons (separate if you want modular listeners)
-└── Makefile                    // For compiling and running your code
