@@ -13,13 +13,14 @@ public class RPSSkel extends JFrame implements ActionListener {
     RPSModel model;
 
     public RPSSkel() {
+        super("Malte&Sina"); //sätter titel
         model = new RPSModel();
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         closebutton = new JButton("Avsluta");
 
         // Skapa spelplaner
-        myboard = new Gameboard("Du", this); // 'this' är lyssnare för spelknapparna
+        myboard = new Gameboard("Sina&Malte", this); // 'this' är lyssnare för spelknapparna
         computersboard = new Gameboard("Datorn");
 
         // Lägg till spelplanerna i en panel
