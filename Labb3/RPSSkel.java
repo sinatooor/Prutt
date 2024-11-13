@@ -72,16 +72,16 @@ public class RPSSkel extends JFrame implements ActionListener {
             computersboard.setUpper(serverMove);
 
             // Avgör vinnaren
-            String result = model.determineWinner(command, serverMove);
+            String[] result = model.determineWinner(command, serverMove);
 
             // Uppdatera resultat
-            myboard.setLower(result);
-            computersboard.setLower(result);
+            myboard.setLower(result[0]);
+            computersboard.setLower(result[1]);
 
             // Uppdatera poäng
-            if (result.equals("Du vann!")) {
+            if (result[0].equals("Du vann!")) {
                 myboard.wins();
-            } else if (result.equals("Du förlorade!")) {
+            } else if (result[0].equals("Du förlorade!")) {
                 computersboard.wins();
             }
 

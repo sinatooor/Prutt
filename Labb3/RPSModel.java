@@ -52,15 +52,15 @@ public class RPSModel {
     }
 
     // Metod för att avgöra vinnaren
-    public String determineWinner(String playerMove, String serverMove) {
+    public String[] determineWinner(String playerMove, String serverMove) {
         if (playerMove.equals(serverMove)) {
-            return "Oavgjort!";
+            return new String[] {"Oavgjort!", "Oavgjort!"};
         } else if ((playerMove.equals("STEN") && serverMove.equals("SAX")) ||
                    (playerMove.equals("SAX") && serverMove.equals("PASE")) ||
                    (playerMove.equals("PASE") && serverMove.equals("STEN"))) {
-            return "Du vann!";
+            return new String[] {"Du vann!", "Du förlorade!"};
         } else {
-            return "Du förlorade!";
+            return new String[] {"Du förlorade!", "Du vann!"};
         }
     }
 }
