@@ -3,7 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 class Gameboard extends JPanel {
-
+	
     private Icon[] icons = {new ImageIcon("rock.gif"), 
 		    new ImageIcon("paper.gif"),
 		    new ImageIcon("scissors.gif")};
@@ -14,7 +14,7 @@ class Gameboard extends JPanel {
     private JLabel upperMess, lowerMess, scorelabel;
     private int score;
     private Color bgcolor;
-    private HashMap<String,JButton> map = new HashMap<String,JButton>();
+    private HashMap<String,JButton> map = new HashMap<String,JButton>(); // HashMap för att koppla gesternas text till motsvarande knapp
 
 
     // Constructor that builds the board, used for computers board
@@ -32,7 +32,7 @@ class Gameboard extends JPanel {
 	// Lower JPanel has messages about the game and score
 	JPanel lower = new JPanel();
 	lower.setLayout(new GridLayout(2,1));
-	lowerMess = new JLabel("win/lose/draw", JLabel.CENTER);
+	lowerMess = new JLabel("börja spela", JLabel.CENTER);
 	scorelabel = new JLabel("Score: 0", JLabel.CENTER);
 	lower.add(lowerMess); lower.add(scorelabel);
 
@@ -54,7 +54,8 @@ class Gameboard extends JPanel {
     // Contructor for players board, puts listener on buttons
     Gameboard(String name, ActionListener listener) {
 	this(name); // call other constructor to build the board
-	for (int i = 0; i<3; i++)
+	
+	for (int i = 0; i<3; i++) // Lägg till action-lyssnaren till varje knapp så att de kan reagera på klick
 	    buttons[i].addActionListener(listener);
     }
 
