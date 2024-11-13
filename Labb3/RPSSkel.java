@@ -5,62 +5,89 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
-public class RPSSkel extends JFrame {
+
+public class RPSSkel extends JFrame implements ActionListener {
     Gameboard myboard, computersboard;
     JButton closebutton;
-    RPSController controller;
+    int counter = 0; // För att räkna ETT... TVÅ... TRE
+    RPSModel model;
 
-    public RPSSkel(RPSController controller) {
-        this.controller = controller;
+    public RPSSkel() {
+        model = new RPSModel();
+
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         closebutton = new JButton("Avsluta");
-        closebutton.addActionListener(new CloseListener());
 
         // Skapa spelplaner
-        myboard = new Gameboard("Du", new ButtonListener());
+        myboard = new Gameboard("Du", this); // 'this' är lyssnare för spelknapparna
         computersboard = new Gameboard("Datorn");
 
+        // Lägg till spelplanerna i en panel
         JPanel boards = new JPanel();
         boards.setLayout(new GridLayout(1, 2));
         boards.add(myboard);
         boards.add(computersboard);
 
+        // Lägg till lyssnare för "Avsluta"-knappen med en anonym inre klass
+        closebutton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                model.closeConnection();
+                System.exit(0);
+            }
+        });
+
+        // Lägg till komponenterna till ramen
         add(boards, BorderLayout.CENTER);
         add(closebutton, BorderLayout.SOUTH);
+
         setSize(350, 650);
         setVisible(true);
     }
 
-    // Uppdatera vyn baserat på modellens data
-    public void updateView(String playerMove, String serverMove, String result) {
-        myboard.markPlayed(playerMove);
-        myboard.setUpper(playerMove);
+    // Implementera actionPerformed för spelknapparna
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+        counter++;
 
-        computersboard.markPlayed(serverMove);
-        computersboard.setUpper(serverMove);
+        if (counter == 1) {
+            myboard.resetColor();
+            computersboard.resetColor();
+            myboard.setLower("ETT...");
+            computersboard.setLower("ETT...");
+        } else if (counter == 2) {
+            myboard.setLower("TVÅ...");
+            computersboard.setLower("TVÅ...");
+        } else if (counter == 3) {
+            // Registrera spelarens drag
+            myboard.markPlayed(command);
+            myboard.setUpper(command);
 
-        myboard.setLower(result);
-        computersboard.setLower(result);
+            // Skicka spelarens drag till servern och få serverns drag
+            String serverMove = model.getServerMove(command);
 
-        if (result.equals("Du vann!")) {
-            myboard.wins();
-        } else if (result.equals("Du förlorade!")) {
-            computersboard.wins();
+            // Visa serverns drag
+            computersboard.markPlayed(serverMove);
+            computersboard.setUpper(serverMove);
+
+            // Avgör vinnaren
+            String result = model.determineWinner(command, serverMove);
+
+            // Uppdatera resultat
+            myboard.setLower(result);
+            computersboard.setLower(result);
+
+            // Uppdatera poäng
+            if (result.equals("Du vann!")) {
+                myboard.wins();
+            } else if (result.equals("Du förlorade!")) {
+                computersboard.wins();
+            }
+
+            counter = 0; // Återställ räknaren
         }
     }
 
-    // Lyssnare för spelknapparna
-    class ButtonListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            controller.handlePlayerMove(e.getActionCommand());
-        }
-    }
-
-    // Lyssnare för Avsluta-knappen
-    class CloseListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            controller.closeConnection();
-            System.exit(0);
-        }
+    public static void main(String[] args) {
+        new RPSSkel();
     }
 }

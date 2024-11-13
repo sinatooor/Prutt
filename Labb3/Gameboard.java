@@ -38,7 +38,7 @@ class Gameboard extends JPanel {
 
 	for (int i = 0; i<3; i++){
 	    buttons[i] = new JButton(icons[i]);
-	    buttons[i].setActionCommand(texts[i]);
+	    buttons[i].setActionCommand(texts[i]); //sätter actionCommand för varje knapp till sten sax pase
 	    add(buttons[i]);
 	    // Store each button in a map with its text as key. 
             // Enables us to retrieve the button from a textvalue. 
