@@ -29,7 +29,7 @@ public class RPSSkel extends JFrame implements ActionListener {
         boards.add(myboard);
         boards.add(computersboard);
 
-        // Lägg till lyssnare för "Avsluta"-knappen med en anonym inre klass
+        // Lägg till lyssnare för Avsluta
         closebutton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 model.closeConnection();
@@ -50,6 +50,7 @@ public class RPSSkel extends JFrame implements ActionListener {
         String command = e.getActionCommand();
         counter++;
 
+        //logiken för spelet och hur man vinner
         if (counter == 1) {
             myboard.resetColor();
             computersboard.resetColor();
