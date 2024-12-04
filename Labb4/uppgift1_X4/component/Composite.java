@@ -1,34 +1,31 @@
+package component;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 
-public class Composite extends Component{
-    private ArrayList<Component> children = new ArrayList<>();
-    private String name;
-    private double weight;
+public class Composite extends Component implements Iterable<Component>{
 
     public Composite(String name, double weight) {
-        this.name = name;
-        this.weight = weight;
+        super(name, weight);
     }
 
     @Override
     public void add(Component component) {
-        children.add(component);
+        this.children.add(component);
     }
 
     @Override
     public boolean remove(Component component) {
-        return children.remove(component);
+        return this.children.remove(component);
     }
 
     @Override
     public Component remove(int index) {
-        return children.remove(index);
+        return this.children.remove(index);
     }
 
     @Override
     public Component getChild(int index) {
-        return children.get(index);
+        return this.children.get(index);
     }
 
     @Override
@@ -55,5 +52,11 @@ public class Composite extends Component{
             totalweight += component.getWeight();
         }
         return totalweight;
+    }
+
+    @Override
+    public Iterator<Component> iterator() {
+        //return new BreddenFörstIterator(this);
+        return new DjupetFörstIterator(this);
     }
 }

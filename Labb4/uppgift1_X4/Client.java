@@ -1,6 +1,8 @@
+import component.*;
+
 public class Client {
 
-    private static Composite fillTheSuitcase(Composite suitcase) {
+    public static Composite fillTheSuitcase(Composite suitcase) {
         
         // create a toiletrybag
         Composite toiletrybag = new Composite("necessär", 0.2);
@@ -9,9 +11,7 @@ public class Client {
         double[] toiletrysWeights = new double[]{0.050, 0.100, 0.090, 0.3};
         
         for (int i=0; i<toiletrys.length; i++) {
-            Leaf l = new Leaf(toiletrys[i], toiletrysWeights[i]);
-            toiletrybag.add(l);
-            //toiletrybag.add(new Leaf(toiletrys[i], toiletrysWeights[i]));
+            toiletrybag.add(new Leaf(toiletrys[i], toiletrysWeights[i]));
         }
         
         // create a plasic bag with a soap and shampoo in it
@@ -36,7 +36,7 @@ public class Client {
         return suitcase;
     }
 
-    private static Composite removeFromSuitcase(Composite suitcase) {
+    public static Composite removeFromSuitcase(Composite suitcase) {
         // ta bort tandborsten ur neccesären
         suitcase.getChild(0).remove(0);
 

@@ -1,11 +1,9 @@
+package component;
 
 public class Leaf extends Component{
-    private String name;
-    private double weight;
 
     public Leaf(String name, double weight) {
-        this.name = name;
-        this.weight = weight;
+        super(name, weight);
     }
 
     @Override
