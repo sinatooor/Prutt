@@ -51,16 +51,22 @@ public class RPSModel {
         }
     }
 
-    // Metod för att avgöra vinnaren
-    public String[] determineWinner(String playerMove, String serverMove) {
-        if (playerMove.equals(serverMove)) {
-            return new String[] {"Oavgjort!", "Oavgjort!"};
-        } else if ((playerMove.equals("STEN") && serverMove.equals("SAX")) ||
-                   (playerMove.equals("SAX") && serverMove.equals("PASE")) ||
-                   (playerMove.equals("PASE") && serverMove.equals("STEN"))) {
-            return new String[] {"Du vann!", "Du förlorade!"};
-        } else {
-            return new String[] {"Du förlorade!", "Du vann!"};
-        }
+// Metod för att avgöra vinnaren i spelet Sten-Sax-Påse
+public String[] determineWinner(String playerMove, String serverMove) {
+    // Om spelarens val är samma som serverns val, är det oavgjort
+    if (playerMove.equals(serverMove)) {
+        return new String[] {"Oavgjort!", "Oavgjort!"}; // Båda resultaten är "Oavgjort"
+    } 
+    // Om spelarens val slår serverns val enligt spelets regler
+    else if ((playerMove.equals("STEN") && serverMove.equals("SAX")) || // Sten slår sax
+             (playerMove.equals("SAX") && serverMove.equals("PASE")) || // Sax slår påse
+             (playerMove.equals("PASE") && serverMove.equals("STEN"))) { // Påse slår sten
+        return new String[] {"Du vann!", "Du förlorade!"}; // Spelaren vinner, servern förlorar
+    } 
+    // Om inget av ovanstående stämmer, vinner servern
+    else {
+        return new String[] {"Du förlorade!", "Du vann!"}; // Spelaren förlorar, servern vinner
     }
-}
+
+
+}}
