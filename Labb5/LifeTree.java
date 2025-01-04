@@ -45,16 +45,11 @@ class LifeTree extends TreeFrame {
 		while (indexEnd != end-1 && endtagExists) {
 			indexStart = indexEnd + 1;
 			currentLevel = this.lines.get(indexStart).split(">")[0].replaceFirst("<", "").split(" ")[0];
-			for (int i=indexStart + 1; ; i++) {
-				try {
-					if (this.lines.get(i).strip().equals("</" + currentLevel + ">")) {
-						indexEnd = i;
-						node.add(this.buildTree(indexStart, indexEnd));
-						break;
-					} 
-				} catch (Exception e) {
-					System.err.println("Endtag " + currentLevel + " is missing");
-					System.exit(0);
+			for (int i = indexStart + 1; ; i++) {
+				if (this.lines.get(i).strip().equals("</" + currentLevel + ">")) {
+					indexEnd = i;
+					node.add(this.buildTree(indexStart, indexEnd));
+					break;
 				}
 				/* 
 				else if (i == end) {
@@ -72,6 +67,15 @@ class LifeTree extends TreeFrame {
 				*/
 			}
 		}
+
+		// ÄNDRING: Kontrollera sluttagg för nuvarande nod
+		String expectedEndTag = "</" + level + ">";
+		String actualEndTag = this.lines.get(end).strip();
+		if (!expectedEndTag.equals(actualEndTag)) {
+			System.err.println("Fel i tag.");
+			System.exit(1);
+		}
+		// SLUT ÄNDRING
 
 		return node;
 	}
