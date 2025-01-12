@@ -56,7 +56,7 @@ public class Composite extends Component implements Iterable<Component>{
 
     @Override
     public Iterator<Component> iterator() {
-        //return new BreddenFörstIterator(this);
-        return new DjupetFörstIterator(this);
+        return new BreddenFörstIterator(this);
+        //return new DjupetFörstIterator(this);
     }
 }
