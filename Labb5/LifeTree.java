@@ -33,7 +33,7 @@ class LifeTree extends TreeFrame {
 
 	MyDefaultMutableTreeNode buildTree(int start, int end) {
 		String name = MyDefaultMutableTreeNode.lineToName(this.lines.get(start));
-		String description = MyDefaultMutableTreeNode.lineToDescription(this.lines.get(0));
+		String description = MyDefaultMutableTreeNode.lineToDescription(this.lines.get(start));
 		String level = MyDefaultMutableTreeNode.lineToLevel(this.lines.get(start));
 
 		MyDefaultMutableTreeNode node = new MyDefaultMutableTreeNode(level, name, description);
@@ -41,16 +41,35 @@ class LifeTree extends TreeFrame {
 		int indexStart;
 		int indexEnd = start;
 		String currentLevel;
-
-		while (indexEnd != end-1) {
+		Boolean endtagExists = true;
+		while (indexEnd != end-1 && endtagExists) {
 			indexStart = indexEnd + 1;
 			currentLevel = this.lines.get(indexStart).split(">")[0].replaceFirst("<", "").split(" ")[0];
 			for (int i=indexStart + 1; ; i++) {
-				if (this.lines.get(i).strip().equals("</" + currentLevel + ">")) {
-					indexEnd = i;
-					node.add(this.buildTree(indexStart, indexEnd));
-					break;
+				try {
+					if (this.lines.get(i).strip().equals("</" + currentLevel + ">")) {
+						indexEnd = i;
+						node.add(this.buildTree(indexStart, indexEnd));
+						break;
+					} 
+				} catch (Exception e) {
+					System.err.println("Endtag " + currentLevel + " is missing");
+					System.exit(0);
 				}
+				/* 
+				else if (i == end) {
+					try {
+						throw new Exception("Endtag is missing");
+					} catch (Exception e){
+						System.err
+					}
+					//System.out.println("Endtag " + currentLevel + " is missing");
+					//endtagExists = false;
+					//System.err.println("Endtag " + currentLevel + " is missing");
+					//break;
+					
+				}
+				*/
 			}
 		}
 

@@ -26,7 +26,7 @@
 </Familj>
 </Klass>
 </Division>
-</Rike>
+</Rik>
 <Rike namn="Djur"> kan förflytta sej
 <Division namn="Däggdjur"> föder levande ungar
 <Art namn="Schimpanser"> är våra kusiner
