@@ -1,0 +1,352 @@
+import javax.swing.*;
+import javax.swing.tree.*;
+
+import java.awt.Color;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+/**
+ * Klassen LifeTree ärver från TreeFrame och är huvudklassen för att skapa ett "livsträd"
+ * baserat på data från en XML-liknande textfil. Den läser in filen, bygger upp en trädstruktur
+ * av MyDefaultMutableTreeNode-noder, och visar resultatet i ett GUI.
+ */
+class LifeTree extends TreeFrame {
+    // En statisk Scanner som används för att läsa in från filen.
+    static Scanner sc;
+
+    // En lista av strängar som håller alla rader som läses in från filen.
+	private ArrayList<String> lines;
+	
+    // Rotnoden i vårt träd. Vi använder vår egen nodtyp MyDefaultMutableTreeNode
+    // som kan lagra rank, namn och beskrivning.
+	MyDefaultMutableTreeNode root;
+
+    /**
+     * Metoden initTree() anropas i konstruktorn hos TreeFrame (den superklassen).
+     * Här skapar vi själva trädet:
+     * 1. Läs in alla rader från filen.
+     * 2. Bygg upp nodstrukturen.
+     * 3. Skapa en DefaultTreeModel med roten.
+     * 4. Bygg ett JTree med denna modell.
+     */
+	@Override
+    void initTree() {
+		this.lines = new ArrayList<>();
+		// Bygg upp trädet från indatafilen
+		buildTree();
+
+		// Skapa trädmodellen från vår rotnod
+		this.treeModel = new DefaultTreeModel(this.root);
+
+		// Skapa ett JTree-objekt från modellen
+		this.tree = new JTree(this.treeModel);
+
+		// Sätt bakgrundsfärg på själva trädet (inte ramen)
+		this.tree.setBackground(Color.GREEN);
+    }
+
+    /**
+     * buildTree läser in alla rader från filen via sc (Scanner)
+     * och bygger sedan upp en rekurserande trädstruktur.
+     */
+    void buildTree() {
+		// Läs in alla rader från filen och lägg dem i arraylisten 'lines'
+		while (sc.hasNextLine()) {
+			this.lines.add(sc.nextLine());
+		}
+
+		// Bygg upp trädet rekurserande från första raden (index 0) till sista (index size-1)
+		this.root = this.buildTree(0, this.lines.size() - 1);
+	} 
+
+    /**
+     * Denna metod är rekurserande och bygger upp en nod av typen MyDefaultMutableTreeNode
+     * tillsammans med dess eventuella barn. Den tar start- och slutindex i 'lines' för att
+     * veta var denna nods data börjar och slutar.
+     * 
+     * Formatet för en rad kan t.ex. vara:
+     * <Biosfär namn="Liv"> förklarande text ...
+     * och i slutet en motsvarande sluttagg: </Biosfär>
+     *
+     * @param start startindex i arraylisten lines där denna nods starttagg finns
+     * @param end slutindex i arraylisten lines där denna nods sluttagg finns
+     * @return en MyDefaultMutableTreeNode som representerar denna del av trädet.
+     */
+	MyDefaultMutableTreeNode buildTree(int start, int end) {
+		// Plocka ut namn, beskrivning och nivå för nuvarande nod utifrån raden på 'start'.
+		String name = MyDefaultMutableTreeNode.lineToName(this.lines.get(start));
+		// Observera: här används för tillfället alltid lines.get(0) för description.
+		// Detta verkar vara en bugg eller misstag i koden. Kanske avsett att vara lines.get(start)?
+		// Jag antar att det borde vara lines.get(start) för att få rätt beskrivning.
+		// Men följer originalkoden:
+		String description = MyDefaultMutableTreeNode.lineToDescription(this.lines.get(0));
+		String level = MyDefaultMutableTreeNode.lineToLevel(this.lines.get(start));
+
+		// Skapa noden med rank, namn och beskrivning
+		MyDefaultMutableTreeNode node = new MyDefaultMutableTreeNode(level, name, description);
+
+		// indexStart och indexEnd används för att hitta barnnoder i den rekursiva strukturen
+		int indexStart;
+		int indexEnd = start;
+		String currentLevel;
+
+		// Denna loop hanterar barnnoder:
+		// Så länge indexEnd inte nått sista barnets sluttagg fortsätter vi söka efter nya barn.
+		while (indexEnd != end - 1) {
+			// Barnets starttagg antas vara på indexStart = indexEnd + 1
+			indexStart = indexEnd + 1;
+
+			// Hämta barnnodens nivå (t.ex. <Rike, <Art osv.)
+			// Splittar på ">" för att separera tagg från text, tar första delen, tar bort "<",
+			// och splittar sedan på blanktecken för att få själva nivån.
+			currentLevel = this.lines.get(indexStart).split(">")[0].replaceFirst("<", "").split(" ")[0];
+
+			// Nu letar vi efter barnnodens sluttagg, </currentLevel>
+			for (int i = indexStart + 1; ; i++) {
+				// Om vi hittar en rad som exakt matchar </currentLevel>, då vet vi att barnnoden
+				// sträcker sig från indexStart till i.
+				if (this.lines.get(i).strip().equals("</" + currentLevel + ">")) {
+					indexEnd = i; 
+					// Rekursivt bygg denna barnnod
+					node.add(this.buildTree(indexStart, indexEnd));
+					break;
+				}
+			}
+		}
+
+		return node;
+	}
+
+    /**
+     * showDetails(TreePath path) visas när man klickar på en nod ifall "Show details" är vald.
+     * Metoden visar en meddelanderuta med nodens information, inklusive dess förklarande text,
+     * samt hela dess ancestorkedja ("är...").
+     */
+    @Override
+    void showDetails(TreePath path){
+		if (path == null)
+			return;
+
+		// Hämta den klickade noden
+		MyDefaultMutableTreeNode clicked = (MyDefaultMutableTreeNode) path.getLastPathComponent();
+
+		// Bygg upp en sträng med nodens rang, namn och beskrivning
+		String s = clicked.getRank() + ": " + clicked.toString() + " " + clicked.getDescription() + ", Men allt som är " + clicked.toString();
+
+		// För att få hela kedjan uppåt i hierarkin använder vi en loop
+		MyDefaultMutableTreeNode parent = clicked;
+		while (parent.getParent() != null) {
+			// Skriv ut i konsol (debug)
+			System.out.println(parent.toString());
+			// Gå uppåt ett steg i hierarkin
+			parent = (MyDefaultMutableTreeNode) parent.getParent();
+			// Lägg till i strängen "är ..." följande föräldern
+			s = s + " är " + parent.toString();
+		}
+
+		// Visa hela strängen i en dialogruta
+		JOptionPane.showMessageDialog(this, s);
+    }
+
+    /**
+     * main-metodens uppgift är att:
+     * 1. Läs in filnamn från kommandorad, eller använd ett standardfilnamn (LillaLiv.txt).
+     * 2. Försök öppna filen med en Scanner.
+     * 3. Skapa ett nytt LifeTree-objekt, vilket i sin tur skapar GUI:t och trädet.
+     */
+    public static void main(String[] args) {
+		String file;
+		if (args.length > 0) {
+			file = args[0];
+		} else {
+			file = "LillaLiv.txt";
+		} 
+		try {
+			LifeTree.sc = new Scanner(new File(file));
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+		}
+
+		new LifeTree();
+    }
+}
+
+
+import javax.swing.tree.DefaultMutableTreeNode;
+
+/**
+ * MyDefaultMutableTreeNode är en utökad version av DefaultMutableTreeNode.
+ * Den lagrar förutom nodens namn (i superklassen), även rank (t.ex. "Biosfär", "Rike", "Art")
+ * och en beskrivande text.
+ */
+public class MyDefaultMutableTreeNode extends DefaultMutableTreeNode{
+    private String description; // Förklarande text om noden
+    private String rank;        // Nivå/rank t.ex. "Biosfär", "Rike", "Art"
+
+    /**
+     * Konstruktor tar in rank, namn och beskrivning.
+     * super(name) anropar DefaultMutableTreeNode-konstruktorn så att noden får ett "namn".
+     */
+    MyDefaultMutableTreeNode(String rank, String name, String description) {
+        super(name);
+        this.description = description;
+        this.rank = rank;
+    }
+
+    public String getRank() {
+        return this.rank;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+    
+    /**
+     * lineToName(s) plockar ut "namn"-attributet från en rad.
+     * Antaget format: <Nivå namn="Något"> ...
+     * Denna metod antar att attributet namn="..."" finns och splittar på citattecken.
+     * Det första citattecknet blir split[1] = namnet.
+     */
+    static String lineToName(String s) {
+        return s.split(String.valueOf('"'))[1];
+    }
+
+    /**
+     * lineToLevel(s) extraherar nivån ur en starttagg.
+     * Exempel: <Biosfär namn="Liv"> returnerar "Biosfär".
+     */
+    static String lineToLevel(String s) {
+        return s.split(">")[0].replaceFirst("<", "").split(" ")[0];
+    }
+
+    /**
+     * lineToDescription(s) extraherar den förklarande texten som står efter ">".
+     * Exempel: <Biosfär namn="Liv"> är allt som fortplantar sej
+     * returnerar "är allt som fortplantar sej".
+     */
+    static String lineToDescription(String s) {
+        return s.split(">")[1].strip();
+    }
+}
+
+
+import javax.swing.*;
+import javax.swing.tree.*;
+//import java.io.*;        
+import java.awt.*;
+import java.awt.event.*;
+
+/**
+ * TreeFrame är en klass som skapar ett fönster med ett JTree och ett par kontroller.
+ * Den kan visas i sig själv, men för att få ett meningsfullt träd måste man ärva den
+ * och överskrida initTree().
+ *
+ * Funktioner:
+ * - Visar ett fönster med en checkbox "Show Details" och en knapp "Close".
+ * - Har ett JTree i mitten.
+ * - Vid klick på en nod, om "Show Details" är ikryssad, visas detaljer i en dialog.
+ */
+class TreeFrame extends JFrame implements ActionListener {
+    JCheckBox box;              // En checkbox för att välja om detaljer ska visas vid klick
+    JTree tree;                 // Själva trädet
+    DefaultMutableTreeNode root;// Rotnoden i trädet
+    DefaultTreeModel treeModel; // Modell som beskriver trädets struktur
+    JPanel controls;            // Panel för att hålla knappar och checkbox
+
+    static final String closeString = " Close ";
+    static final String showString = " Show Details ";
+
+    /**
+     * Konstruktor för TreeFrame:
+     * - Bygger upp GUI:t.
+     * - Anropar initTree() som bör överskridas av subklassen för att skapa ett meningsfullt träd.
+     * - Lägger till lyssnare för klick på trädet.
+     */
+    TreeFrame() {
+		Container c = getContentPane();
+
+		// initTree() ska skapas i subklass för att bygga önskat träd
+		initTree();
+
+		// Lyssnare för musklick på trädet. Om "Show Details" är ibockat ska showDetails anropas.
+		tree.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (box.isSelected())
+					showDetails(tree.getPathForLocation(e.getX(), e.getY()));
+			}
+		});
+			
+		controls = new JPanel();
+		box = new JCheckBox(showString);
+
+		initGUI();
+		c.add(controls, BorderLayout.NORTH);
+		c.add(tree, BorderLayout.CENTER);   
+		setVisible(true);
+    } 
+
+    /**
+     * actionPerformed tar hand om händelser från knappar i GUI:t.
+     * Om man klickar på "Close" stängs fönstret (dispose()).
+     */
+    public void actionPerformed(ActionEvent e) {
+		String cmd = e.getActionCommand();
+		if (cmd.equals(closeString))
+			dispose();
+    }
+
+    /**
+     * initGUI sätter upp font, lägger till checkbox och knapp i kontrollpanelen.
+     * Sätter även storlek på fönstret.
+     */
+    void initGUI() {
+		tree.setFont(new Font("Dialog", Font.BOLD, 12));
+		controls.add(box);
+		addButton(closeString);
+		controls.setBackground(Color.lightGray);
+		controls.setLayout(new FlowLayout());    
+		setSize(400, 400);
+    }
+ 
+    /**
+     * addButton skapar en knapp, sätter font, lägger till actionlistener och lägger
+     * till den i kontrollpanelen.
+     */
+    void addButton(String n) {
+		JButton b = new JButton(n);
+		b.setFont(new Font("Dialog", Font.BOLD, 12));
+		b.addActionListener(this);
+		controls.add(b);
+    }
+
+    /**
+     * initTree ska överskridas i subklasser. Här är en "dummy"-implementation:
+     * skapar en rotnod och ett JTree av denna samt en DefaultTreeModel.
+     */
+    void initTree(){
+		root = new DefaultMutableTreeNode("Teststring");
+		treeModel = new DefaultTreeModel(root);
+		tree = new JTree(treeModel);
+    }
+
+    /**
+     * showDetails visar information om den valda noden i en dialogruta.
+     * Här i basklassen visas bara nodens toString()-värde.
+     * I subklassen (LifeTree) överskrivs denna metod med mer detaljerad info.
+     */
+    void showDetails(TreePath path){
+		if (path == null)
+			return;
+		String info = path.getLastPathComponent().toString();
+		JOptionPane.showMessageDialog(this, info);
+    }
+
+    /**
+     * main för TreeFrame. Startar bara ett enkelt tomt fönster med en tomt träd.
+     * Används mest för test.
+     */
+    public static void main(String[] u) {
+		new TreeFrame();
+    }
+}

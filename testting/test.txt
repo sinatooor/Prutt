@@ -1,0 +1,22 @@
+NOTES: T-VÄRDE FÖR TVá STICKPROV
+
+Formeln för t-värde när man jämför tvá stickprov är:
+
+t = ((X1_mean - X2_mean) / sqrt((S1^2 / n1) + (S2^2 / n2)))
+
+Där:
+- X1_mean och X2_mean är medelvärden för de tvá stickproven.
+- S1 och S2 är standardavvikelserna för de tvá stickproven.
+- n1 och n2 är storlekarna pá de tvá stickproven.
+
+NOTES: T-VÄRDE FÖR ETT STICKPROV
+
+Formeln för att beräkna t-värdet är:
+
+t = (X_mean - mu) / (S / sqrt(n))
+
+Där:
+- X_mean är stickprovsmedelvärdet.
+- mu är populationsmedelvärdet (hypotetiskt eller förväntat medelvärde).
+- S är standardavvikelsen för stickprovet.
+- n är stickprovsstorleken.
