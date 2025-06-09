@@ -56,6 +56,7 @@ public class GameController {
     }
 
     // Hanterar tangenttryckningar
+    private int counting = 0; // För att räkna antalet drag
     private void handleKeyPress(int keyCode) {
         if (gameOver) {
             if (keyCode == KeyEvent.VK_R) {
@@ -81,14 +82,28 @@ public class GameController {
             GameState currentState = board.getState();
             boolean moveMade = board.move(direction);
 
+            
             if (moveMade) {
+                // Spara tidigare state för ångra-funktionen
                 history.push(currentState);
-                board.addRandomTile();
-                updateGameView();
 
+                // Räkna draget
+                counting++;
+                // board.addRandomTile();
+                // board.addRandomTile();
+                // board.addRandomTile();
+                // board.addRandomTile();
+                board.addRandomTile();
+                // Lägg till ny tile var tredje drag
+                // if (counting % 3 == 0) {
+                //     board.addRandomTile();
+                // }
+
+                // Uppdatera vy och kontrollera spelöver
+                updateGameView();
                 if (board.isGameOver()) {
                     gameOver = true;
-                    handleGameOver(); // Anropar JOptionPane härifrån
+                    handleGameOver();
                 }
             }
         }

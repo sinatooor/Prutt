@@ -55,16 +55,29 @@ public class Board implements Serializable {
 
     // Lägger till en ny bricka (2 eller 4) på en slumpmässig tom plats
     public boolean addRandomTile() {
-        List<Position> emptyPositions = getEmptyPositions();
-        if (emptyPositions.isEmpty()) {
-            return false; // Inga tomma platser, kan inte lägga till bricka
+                // Hitta första tomma ruta högst upp till vänster
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                if (grid[r][c] == null) {
+                    grid[r][c] = new Tile(256);  // Alltid värde 4
+                    return true;
+                }
+            }
         }
-
-        Position randomPos = emptyPositions.get(random.nextInt(emptyPositions.size()));
-        int value = random.nextInt(10) == 0 ? 4 : 2; // 10% chans för 4, annars 2
-        grid[randomPos.row][randomPos.col] = new Tile(value);
-        return true;
+        return false;  // Inga tomma platser
     }
+    // some changes 
+
+    //     List<Position> emptyPositions = getEmptyPositions();
+    //     if (emptyPositions.isEmpty()) {
+    //         return false; // Inga tomma platser, kan inte lägga till bricka
+    //     }
+
+    //     Position randomPos = emptyPositions.get(random.nextInt(emptyPositions.size()));
+    //     int value = random.nextInt(10) == 0 ? 4 : 2; // 10% chans för 4, annars 2
+    //     grid[randomPos.row][randomPos.col] = new Tile(value);
+    //     return true;
+    // }
 
     // Returnerar en lista med koordinater för alla tomma rutor
     private List<Position> getEmptyPositions() {

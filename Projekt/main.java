@@ -34,7 +34,7 @@ public class Main {
         JLabel scoreLabel = new JLabel("Score: 0", SwingConstants.CENTER);
         scoreLabel.setFont(new Font("Arial", Font.BOLD, 24));
 
-        // Skapa knappar (valfritt, eftersom vi har tangentbordskontroller)
+        // Skapa knappar 
         JPanel buttonPanel = new JPanel(new FlowLayout()); // En rad med knappar
         JButton restartButton = new JButton("Restart (R)");
         JButton undoButton = new JButton("Undo (U)");

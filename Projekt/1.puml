@@ -1,0 +1,112 @@
+@startuml
+skinparam classAttributeIconSize 0            ' minimalistiskt utseende
+
+'====================  PACKAGES  ====================
+package model {
+  class Board {
+    - size : int
+    - tiles : Tile[][]
+    - score : int
+    + reset() : void
+    + move(dir : Direction) : boolean
+    + addRandomTile() : void
+    + canMove() : boolean
+    + getScore() : int
+    + clone() : Board
+  }
+
+  class Tile {
+    - value : int
+    - merged : boolean
+    + getValue() : int
+    + setMerged(m : boolean) : void
+  }
+
+  enum Direction {
+    UP
+    DOWN
+    LEFT
+    RIGHT
+  }
+
+  class MoveCommand {
+    - boardSnapshot : Board
+    - score : int
+    + getBoardSnapshot() : Board
+    + getScore() : int
+  }
+
+  class GameState {
+    - board : Board
+    - score : int
+    - history : Stack<MoveCommand>
+  }
+}
+
+package view {
+  class GameView {
+    - board : Board
+    + setBoard(b : Board) : void
+    + paintComponent(g : Graphics) : void
+  }
+
+  class TileView {
+    + draw(g : Graphics2D, x : int, y : int, size : int, tile : Tile) : void
+  }
+}
+
+package controller {
+  class GameController {
+    - board : Board
+    - view : GameView
+    - highScoreMgr : HighScoreManager
+    - history : Stack<MoveCommand>
+    + initialize(frm : JFrame, lbl : JLabel) : void
+    + move(dir : Direction) : void
+    + restartGame() : void
+    + undoMove() : void
+    + saveGame() : void
+    + loadGame() : void
+    + showHighScores() : void
+  }
+
+  class AutoPlayerStrategy {
+    + nextMove(board : Board) : Direction
+  }
+}
+
+class HighScoreManager {
+  - leaderboardPath : String
+  + addScore(name : String, score : int) : void
+  + getTopScores() : List<String>
+}
+
+class Main {
+  + main(args : String[]) : void
+}
+
+'====================  RELATIONER  ====================
+Main --> GameController : creates
+Main --> Board
+Main --> GameView
+Main --> HighScoreManager
+
+GameController --> Board
+GameController --> GameView
+GameController --> HighScoreManager
+GameController --> MoveCommand
+GameController --> AutoPlayerStrategy
+
+GameView --> Board
+GameView --> TileView
+
+Board --> Tile
+Board --> Direction
+MoveCommand --> Board
+
+GameState --> Board
+GameState --> MoveCommand
+
+HighScoreManager ..> GameState : save/load
+
+@enduml

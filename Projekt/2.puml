@@ -1,0 +1,102 @@
+@startuml
+'––––––––– Diagram-utseende –––––––––
+skinparam classAttributeIconSize 0
+hide empty members
+
+'––––––––– Klasser –––––––––
+class Main {
+    + main(String[]): void
+}
+
+class GameController {
+    - Board board
+    - GameView view
+    - HighScoreManager highScoreManager
+    - Stack<MoveCommand> history
+    + initialize(JFrame, JLabel): void
+    + move(Direction): void
+    + restartGame(): void
+    + undoMove(): void
+    + saveGame(): void
+    + loadGame(): void
+    + showHighScores(): void
+}
+
+class Board {
+    - Tile[][] grid
+    - int score
+    + boolean move(Direction)
+    + void addRandomTile()
+    + boolean canMove()
+    + Board clone()
+}
+
+class Tile {
+    - int value
+    - boolean merged
+    + int getValue()
+    + void setMerged(boolean)
+}
+
+enum Direction {
+    UP
+    DOWN
+    LEFT
+    RIGHT
+}
+
+class MoveCommand {
+    - Board boardSnapshot
+    - int scoreSnapshot
+}
+
+class GameState {
+    - Board board
+    - int score
+    - Stack<MoveCommand> history
+}
+
+class GameView {
+    - Board board
+    + void setBoard(Board)
+    + paintComponent(Graphics): void
+}
+
+class TileView {
+    + draw(Graphics2D, int x, int y, int size, Tile): void
+}
+
+class HighScoreManager {
+    - String filePath
+    + addScore(String, int): void
+    + List<ScoreEntry> getTopScores()
+}
+
+class AutoPlayerStrategy {
+    + Direction nextMove(Board)
+}
+
+'––––––––– Relationer –––––––––
+Board  "1" o-- "16" Tile                 : contains
+Board  --> Direction                     : uses
+
+GameController --> Board
+GameController --> GameView
+GameController --> HighScoreManager
+GameController --> MoveCommand
+GameController ..> AutoPlayerStrategy     : uses
+
+GameView --> Board
+GameView --> TileView
+
+MoveCommand --> Board
+
+GameState --> Board
+GameState --> MoveCommand
+
+Main --> GameController
+Main --> Board
+Main --> GameView
+Main --> HighScoreManager
+
+@enduml

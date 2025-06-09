@@ -1,0 +1,139 @@
+@startuml
+' UML diagram for the 2048 Java Swing Game
+' Skin parameters for better readability
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+hide empty members
+
+' === Main Entry Point ===
+package "main" {
+    class Main {
+        + static void main(String[] args)
+        - static void createAndShowGUI()
+    }
+}
+
+' === View Package ===
+package "view" {
+    class GameView extends javax.swing.JPanel {
+        - board: Board
+        - TILE_SIZE: int
+        - TILE_COLORS: Map<Integer, Color>
+        + setBoard(Board board)
+        # paintComponent(Graphics g)
+    }
+}
+
+' === Controller Package ===
+package "controller" {
+    class GameController {
+        - board: Board
+        - gameView: GameView
+        - highScoreManager: HighScoreManager
+        - history: Stack<GameState>
+        - gameOver: boolean
+        + initialize(JFrame frame, JLabel scoreLabel)
+        - handleKeyPress(int keyCode)
+        + updateGameView()
+        + restartGame()
+        + undoMove()
+        + saveGame()
+        + loadGame()
+    }
+
+    class AutoPlayerStrategy {
+        + chooseMove(Board board): Direction
+    }
+}
+
+' === Model Package ===
+package "model" {
+    class Board implements java.io.Serializable {
+        + {static} SIZE: int
+        - grid: Tile[][]
+        - score: int
+        + Board()
+        + move(Direction direction): boolean
+        + addRandomTile(): boolean
+        + isGameOver(): boolean
+        + getGrid(): Tile[][]
+        + getScore(): int
+        + getState(): GameState
+        + setState(GameState state)
+    }
+
+    class Tile implements java.io.Serializable {
+        - value: int
+        + getValue(): int
+    }
+
+    class GameState implements java.io.Serializable {
+        - grid: Tile[][]
+        - score: int
+        + getGrid(): Tile[][]
+        + getScore(): int
+    }
+
+    class HighScoreManager {
+        - highScores: List<ScoreEntry>
+        - {static} MAX_SCORES: int
+        + addScore(int score, String name)
+        + isHighScore(int score): boolean
+        + getHighScores(): List<ScoreEntry>
+    }
+
+    class "HighScoreManager.ScoreEntry" as ScoreEntry implements java.io.Serializable, Comparable {
+        - score: int
+        - name: String
+        + getScore(): int
+        + getName(): String
+    }
+
+    enum Direction {
+        UP
+        DOWN
+        LEFT
+        RIGHT
+        - deltaRow: int
+        - deltaCol: int
+        + getDeltaRow(): int
+        + getDeltaCol(): int
+    }
+}
+
+' === Relationships ===
+
+' Main class creates the core components
+Main ..> GameController : "creates"
+Main ..> Board : "creates"
+Main ..> GameView : "creates"
+Main ..> HighScoreManager : "creates"
+
+' GameController is the central coordinator
+GameController "1" o--> "1" Board : "manages"
+GameController "1" o--> "1" GameView : "updates"
+GameController "1" o--> "1" HighScoreManager : "uses"
+GameController ..> Direction : "uses"
+GameController ..> GameState : "uses for history"
+GameController "1" *--> "1" java.util.Stack : "holds history"
+java.util.Stack "1" o--> "0..*" GameState
+
+' View displays the model
+GameView "1" --> "1" Board : "renders"
+GameView ..> Tile : "draws"
+
+' Model components
+Board "1" *--> "0..16" Tile : "composed of"
+Board ..> GameState : "creates/restores"
+Board ..> Direction : "uses"
+
+GameState "1" o--> "0..16" Tile : "snapshot of"
+
+HighScoreManager "1" *--> "0..10" ScoreEntry : "composed of"
+
+' Optional AI strategy
+AutoPlayerStrategy ..> Board : "analyzes"
+AutoPlayerStrategy ..> Direction : "chooses"
+
+
+@enduml

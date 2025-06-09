@@ -1,0 +1,82 @@
+@startuml
+'––––––––– Layout & stil –––––––––
+skinparam classAttributeIconSize 0
+hide empty members
+
+'––––––––– Paket –––––––––
+package controller {
+    class GameController
+}
+
+package model {
+    class Board
+    class Tile
+    enum  Direction
+    class MoveCommand
+    class GameState
+}
+
+package view {
+    class GameView
+    class TileView
+}
+
+package util {
+    class HighScoreManager
+    class AutoPlayerStrategy
+}
+
+class Main
+
+' Externa Swing-klasser (för arvs-/assoc-pilar)
+class JFrame
+class JPanel
+class JComponent
+interface KeyListener
+
+' Enkel strategi-interface för att kunna visa «Realization»
+interface Strategy
+
+'––––––––– Relationer med *korrekta* UML-pilar –––––––––
+'
+'  ▸ Composition        *--
+'  ▸ Aggregation        o--
+'  ▸ Association        --
+'  ▸ Directed Assoc.    -->
+'  ▸ Dependency / Usage ..>
+'  ▸ Generalization     --|>
+'  ▸ Realization        ..|>
+
+'— Model
+Board    "1"  *--  "0..16" Tile          : composition
+Board         -->  Direction             : directed assoc.
+
+'— Controller
+GameController "1" -->  "1"  Board
+GameController "1" -->  "1"  GameView
+GameController "1" -->  "1"  HighScoreManager
+GameController "1" -->  "*"  MoveCommand
+GameController      ..>       AutoPlayerStrategy      : usage
+GameController      ..|>      KeyListener             : realization
+GameController "1" --  "1"  JFrame                   : association (håller referens)
+
+'— View
+GameView  "1" o-- "0..16" TileView                   : aggregation
+GameView       --|> JPanel                           : generalization
+TileView       --|> JComponent                       : generalization
+
+'— Undo & Save/Load
+MoveCommand "1" *-- "1" Board                        : composition
+GameState   "1" *-- "1" Board                        : composition
+GameState   "1" *-- "*" MoveCommand                  : composition
+
+'— Strategy-exempel
+AutoPlayerStrategy ..|> Strategy                     : realization
+
+'— Startklass
+Main        ..>  GameController                      : dependency
+Main        ..>  Board                               : dependency
+Main        ..>  GameView                            : dependency
+Main        ..>  HighScoreManager                    : dependency
+Main        ..>  JFrame                              : dependency
+@enduml
