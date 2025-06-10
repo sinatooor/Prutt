@@ -11,21 +11,9 @@ import java.util.Random;
  * It also supports saving and loading game states.
  */
 public class Board {
-    /**
-     * The size of the grid (e.g., 4 for a 4x4 grid).
-     */
     public static final int SIZE = 4;
-    /**
-     * The 2D array representing the grid of tiles.
-     */
     private Tile[][] grid;
-    /**
-     * The current score of the game.
-     */
     private int score;
-    /**
-     * Random number generator for adding new tiles.
-     */
     private Random random = new Random();
     /**
      * Stores the position (row and column) of the most recently added random tile.

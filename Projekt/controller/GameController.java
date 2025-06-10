@@ -73,9 +73,6 @@ public class GameController {
      */
     private void handleKeyPress(int keyCode) {
 
-        //     return;
-        // }
-
         if (gameOver) {
             if (keyCode == KeyEvent.VK_R) {
                 restartGame();
@@ -105,15 +102,9 @@ public class GameController {
                 history.push(currentState);
                 board.addRandomTile();
 
-
-                // 1. Starta "flashen" i vyn.
                 gameView.flashNewTile(board.getLastAddedPos());
                 
-                // 2. Uppdatera poängen manuellt.
                 scoreLabel.setText("Score: " + board.getScore());
-                
-                // 3. Ta bort allt som har med Thread.sleep och animationInProgress att göra.
-
                 
                 if (board.isGameOver()) {
                     gameOver = true;

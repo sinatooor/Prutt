@@ -20,21 +20,9 @@ import java.util.Map;
  */
 public class GameView extends JPanel {
 
-    /**
-     * The size (width and height) of each tile in pixels.
-     */
     private static final int TILE_SIZE = 100;
-    /**
-     * The gap or spacing between tiles and around the grid in pixels.
-     */
     private static final int GAP = 10;
-    /**
-     * The arc size for the rounded corners of the tiles in pixels.
-     */
     private static final int ARC_SIZE = 10;
-    /**
-     * The game board model containing the grid data to be displayed.
-     */
     private Board board;
     
    
@@ -46,7 +34,7 @@ public class GameView extends JPanel {
     /**
      * Timer to control the duration of the flash animation for a new tile.
      */
-    private Timer flashTimer; // En timer för att styra animationens längd
+    private Timer flashTimer; 
 
     
     // Färger och statiska block är oförändrade
@@ -54,21 +42,9 @@ public class GameView extends JPanel {
      * Background color for the game panel.
      */
     private static final Color GAME_BACKGROUND_COLOR = new Color(0xC8A2C8);
-    /**
-     * Color for empty tile slots in the grid.
-     */
     private static final Color EMPTY_TILE_COLOR = new Color(0xE6E6FA);
-    /**
-     * Default background color for tiles if their value doesn't have a specific color defined.
-     */
     private static final Color DEFAULT_TILE_COLOR = new Color(0x301934);
-    /**
-     * Default dark text color, used for tiles with lighter backgrounds.
-     */
     private static final Color DARK_TEXT_COLOR = new Color(0x483D8B);
-    /**
-     * Default light text color, used for tiles with darker backgrounds.
-     */
     private static final Color LIGHT_TEXT_COLOR = new Color(0xFFF0F5);
     /**
      * Map associating tile values with their specific background colors.
