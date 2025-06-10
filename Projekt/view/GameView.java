@@ -31,6 +31,8 @@ public class GameView extends JPanel {
      * Null if no tile is currently flashing.
      */
     private Position posToFlash;
+    private int numberOfFlashes;
+    private Position lastFlashedPosition;
     /**
      * Timer to control the duration of the flash animation for a new tile.
      */
@@ -84,17 +86,29 @@ public class GameView extends JPanel {
         setBackground(GAME_BACKGROUND_COLOR);
         setFocusable(true);
         
-        // Denna ActionListener körs EN GÅNG efter 300 ms.
+
+        // för animation
+        // Denna ActionListener körs EN GÅNG efter 300 ms. 
         ActionListener timerAction = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                posToFlash = null; // Stäng av "flashen"
-                repaint();         // Rita om en sista gång med vanlig färg
+                if (numberOfFlashes > 0) {
+                    if (posToFlash == null) {
+                        posToFlash = lastFlashedPosition;
+                    } else {
+                        posToFlash = null;
+                    }
+                    numberOfFlashes--;
+                    repaint();
+                } else {
+                    posToFlash = null;
+                    repaint();
+                    flashTimer.stop();
+                }
             }
         };
-        flashTimer = new Timer(300, timerAction);
-        flashTimer.setRepeats(false); // Viktigt: Timern ska bara köra en gång per start
-
+        flashTimer = new Timer(200, timerAction);
+        flashTimer.setRepeats(true); // Gör att timern fortsätter köra tills den stoppas
     }
     
     /**
@@ -135,11 +149,14 @@ public class GameView extends JPanel {
                     int value = grid[r][c].getValue();
                     Color tileColor;
                     
-
+                    // animation 
                     // Denna logik fungerar nu eftersom timern kommer att sätta posToFlash till null
+                    // Om det finns en tile som ska blinka och den är på den här raden och kolumnen
                     if (posToFlash != null && posToFlash.row == r && posToFlash.col == c) {
+                        // Sätt färgen till vitt för att markera flash-animationen
                         tileColor = Color.WHITE;
                     } else {
+                        // Annars använd standardfärg baserat på tile-värdet
                         tileColor = TILE_COLORS.getOrDefault(value, DEFAULT_TILE_COLOR);
                     }
                     
@@ -218,7 +235,10 @@ public class GameView extends JPanel {
      */
     public void flashNewTile(Position pos) {
         this.posToFlash = pos;
-        
+        this.lastFlashedPosition = pos; // Spara den senaste positionen som blixtrade
+        // Om pos är null, stoppa flash-animationen
+        this.numberOfFlashes = 4; // Nollställ antalet blixtrar
+
         // Om en flash-animation redan körs, stoppa den gamla och starta om
         // Detta hanterar snabba drag.
         if (flashTimer.isRunning()) {
