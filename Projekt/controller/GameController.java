@@ -198,30 +198,27 @@ public class GameController {
 
     public void toggleAutoPlay() {
         if (autoPlayer == null) {
-            autoPlayer = new AutoPlayerStrategy() {
-                @Override
-                public void run() {
-                    while (!Thread.currentThread().isInterrupted()) {
-                        try {
-                            Thread.sleep(1000);
-                            int[] directions = new int[]{KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT};
-                            int randomDirection = directions[(int) (Math.random() * directions.length)];
-                            handleKeyPress(randomDirection);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        }
-                    }
-                }
-            };
-            autoPlayer.start();
-            System.out.println("Auto Play started.");
-            JOptionPane.showMessageDialog(mainFrame, "Auto Play started. Press 'A' again to stop.", "Auto Play", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            autoPlayer.interrupt();
+            autoPlayer = new AutoPlayerStrategy();
             autoPlayer = null;
             System.out.println("Auto Play stopped.");
             JOptionPane.showMessageDialog(mainFrame, "Auto Play stopped.", "Auto Play", JOptionPane.INFORMATION_MESSAGE);
         }
         gameView.requestFocusInWindow();
+    }
+
+    private class AutoPlayerStrategy extends Thread {
+        @Override
+        public void run() {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(1000);
+                    int[] directions = new int[]{KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT};
+                    int randomDirection = directions[(int) (Math.random() * directions.length)];
+                    handleKeyPress(randomDirection);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
     }
 }
