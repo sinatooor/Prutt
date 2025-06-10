@@ -11,24 +11,68 @@ import java.awt.geom.AffineTransform;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents the graphical view of the 2048 game.
+ * This class is responsible for drawing the game board, tiles with their values and colors,
+ * score (implicitly via a separate label updated by the controller),
+ * and handling tile appearance animations (flashing).
+ * It also displays a "Game Over" message and a decorative side text.
+ */
 public class GameView extends JPanel {
 
+    /**
+     * The size (width and height) of each tile in pixels.
+     */
     private static final int TILE_SIZE = 100;
+    /**
+     * The gap or spacing between tiles and around the grid in pixels.
+     */
     private static final int GAP = 10;
+    /**
+     * The arc size for the rounded corners of the tiles in pixels.
+     */
     private static final int ARC_SIZE = 10;
+    /**
+     * The game board model containing the grid data to be displayed.
+     */
     private Board board;
     
-    // === ÄNDRING HÄR: Variabler för animation ===
+   
+    /**
+     * The position of the tile that should currently be "flashing" (rendered differently).
+     * Null if no tile is currently flashing.
+     */
     private Position posToFlash;
+    /**
+     * Timer to control the duration of the flash animation for a new tile.
+     */
     private Timer flashTimer; // En timer för att styra animationens längd
-    // === SLUT PÅ ÄNDRING ===
+
     
     // Färger och statiska block är oförändrade
+    /**
+     * Background color for the game panel.
+     */
     private static final Color GAME_BACKGROUND_COLOR = new Color(0xC8A2C8);
+    /**
+     * Color for empty tile slots in the grid.
+     */
     private static final Color EMPTY_TILE_COLOR = new Color(0xE6E6FA);
+    /**
+     * Default background color for tiles if their value doesn't have a specific color defined.
+     */
     private static final Color DEFAULT_TILE_COLOR = new Color(0x301934);
+    /**
+     * Default dark text color, used for tiles with lighter backgrounds.
+     */
     private static final Color DARK_TEXT_COLOR = new Color(0x483D8B);
+    /**
+     * Default light text color, used for tiles with darker backgrounds.
+     */
     private static final Color LIGHT_TEXT_COLOR = new Color(0xFFF0F5);
+    /**
+     * Map associating tile values with their specific background colors.
+     */
     private static final Map<Integer, Color> TILE_COLORS = new HashMap<>();
     static {
         TILE_COLORS.put(0, EMPTY_TILE_COLOR);
@@ -39,6 +83,9 @@ public class GameView extends JPanel {
         TILE_COLORS.put(512, new Color(0x800080)); TILE_COLORS.put(1024, new Color(0x4B0082));
         TILE_COLORS.put(2048, new Color(0x483D8B)); TILE_COLORS.put(4096, new Color(0x301934));
     }
+    /**
+     * Map associating tile values with their specific text colors.
+     */
     private static final Map<Integer, Color> TEXT_COLORS = new HashMap<>();
     static {
         TEXT_COLORS.put(2, DARK_TEXT_COLOR); TEXT_COLORS.put(4, DARK_TEXT_COLOR);
@@ -49,13 +96,18 @@ public class GameView extends JPanel {
         TEXT_COLORS.put(2048, LIGHT_TEXT_COLOR); TEXT_COLORS.put(4096, LIGHT_TEXT_COLOR);
     }
     
+    /**
+     * Constructs a new GameView.
+     * Initializes the panel's preferred size based on tile dimensions and board size,
+     * sets the background color, makes the panel focusable to receive key events,
+     * and sets up a timer for the new tile flash animation.
+     */
     public GameView() {
         int totalGridSize = Board.SIZE * TILE_SIZE + (Board.SIZE + 1) * GAP;
         setPreferredSize(new Dimension(totalGridSize + TILE_SIZE, totalGridSize));
         setBackground(GAME_BACKGROUND_COLOR);
         setFocusable(true);
-
-        // === ÄNDRING HÄR: Initiera timern ===
+        
         // Denna ActionListener körs EN GÅNG efter 300 ms.
         ActionListener timerAction = new ActionListener() {
             @Override
@@ -66,13 +118,27 @@ public class GameView extends JPanel {
         };
         flashTimer = new Timer(300, timerAction);
         flashTimer.setRepeats(false); // Viktigt: Timern ska bara köra en gång per start
-        // === SLUT PÅ ÄNDRING ===
+
     }
     
+    /**
+     * Sets the game board model that this view should render.
+     * @param board The {@link Board} object containing the game data.
+     */
     public void setBoard(Board board) {
         this.board = board;
     }
 
+    /**
+     * Paints the game board and its components. This method is called by Swing when
+     * the panel needs to be redrawn (e.g., after a call to {@code repaint()}).
+     * It draws the grid background, each tile with its value and appropriate color,
+     * a decorative vertical text, and a "Game Over" overlay if the game has ended.
+     * It also handles the visual "flash" effect for newly added tiles by drawing
+     * the tile at {@code posToFlash} with a distinct color.
+     *
+     * @param g The {@link Graphics} context used for painting.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -93,7 +159,7 @@ public class GameView extends JPanel {
                     int value = grid[r][c].getValue();
                     Color tileColor;
                     
-                    // === ÄNDRING HÄR: Samma logik som förut ===
+
                     // Denna logik fungerar nu eftersom timern kommer att sätta posToFlash till null
                     if (posToFlash != null && posToFlash.row == r && posToFlash.col == c) {
                         tileColor = Color.WHITE;
@@ -143,10 +209,16 @@ public class GameView extends JPanel {
              g2d.drawString(msg, (getWidth() - msgWidth) / 2, getHeight() / 2);
         }
 
-        // === ÄNDRING HÄR: Vi tar bort nollställningen härifrån ===
-        // this.posToFlash = null; // <-- DENNA RAD TAS BORT. Timern sköter detta nu.
+
     }
 
+    /**
+     * Determines the appropriate font for rendering a tile's value.
+     * The font size is adjusted based on the magnitude of the value to ensure
+     * it fits reasonably within the tile.
+     * @param value The integer value of the tile.
+     * @return A {@link Font} object (Arial, bold) with a dynamically determined size.
+     */
     private Font getFontForValue(int value) {
         int fontSize;
         if (value >= 10000) fontSize = 24;
@@ -157,7 +229,17 @@ public class GameView extends JPanel {
         return new Font("Arial", Font.BOLD, fontSize);
     }
     
-    // === ÄNDRING HÄR: Uppdaterad metod för att starta animationen ===
+
+    /**
+     * Initiates a "flash" animation for a newly added tile at the specified position.
+     * The tile at the given position will briefly be rendered with a special color (white)
+     * to highlight its appearance. The flash effect is controlled by {@link #flashTimer}.
+     * If another flash animation is already in progress, it is stopped, and a new one starts.
+     * After setting the position to flash, a repaint is triggered.
+     *
+     * @param pos The {@link Position} of the new tile to flash. If null, no specific tile
+     *            will be marked for flashing, though the timer might still run its course.
+     */
     public void flashNewTile(Position pos) {
         this.posToFlash = pos;
         
