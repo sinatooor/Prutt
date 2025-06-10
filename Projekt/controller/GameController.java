@@ -199,6 +199,11 @@ public class GameController {
     public void toggleAutoPlay() {
         if (autoPlayer == null) {
             autoPlayer = new AutoPlayerStrategy();
+            autoPlayer.start();
+            System.out.println("Auto Play started.");
+            JOptionPane.showMessageDialog(mainFrame, "Auto Play started. Press 'A' again to stop.", "Auto Play", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            autoPlayer.interrupt();
             autoPlayer = null;
             System.out.println("Auto Play stopped.");
             JOptionPane.showMessageDialog(mainFrame, "Auto Play stopped.", "Auto Play", JOptionPane.INFORMATION_MESSAGE);
