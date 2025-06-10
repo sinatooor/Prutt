@@ -11,6 +11,7 @@ import java.util.Stack;
 
 public class GameController {
 
+    private boolean animationInProgress = false; // För att hantera animationer
     private Board board;
     private GameView gameView; // Nu en JPanel
     private HighScoreManager highScoreManager;
@@ -18,6 +19,8 @@ public class GameController {
     private JFrame mainFrame; // Referens till huvudfönstret (för KeyListener)
     private boolean gameOver = false;
     private Stack<GameState> history; // För Ångra-funktion
+
+    private AutoPlayerStrategy autoPlayer; // <-- NY VARIABEL
 
     private static final String SAVE_FILE_PATH = "gamestate.ser";
 
@@ -58,6 +61,10 @@ public class GameController {
     // Hanterar tangenttryckningar
     private int counting = 0; // För att räkna antalet drag
     private void handleKeyPress(int keyCode) {
+        if (this.animationInProgress) {
+            return; // Ignorera tangenttryckningar under animation
+        }
+
         if (gameOver) {
             if (keyCode == KeyEvent.VK_R) {
                 restartGame();
@@ -75,6 +82,7 @@ public class GameController {
             case KeyEvent.VK_U:     undoMove(); return;
             case KeyEvent.VK_S:     saveGame(); return;
             case KeyEvent.VK_L:     loadGame(); return;
+            case KeyEvent.VK_A:     toggleAutoPlay(); return; // Ny tangent för Auto Play
             default:    return; // Ignorera andra tangenter
         }
 
@@ -98,7 +106,19 @@ public class GameController {
                 // if (counting % 3 == 0) {
                 //     board.addRandomTile();
                 // }
-
+                
+                this.animationInProgress = true; // Sätt flagga för animation
+                //time out 1 sekund för att låta animationen slutföras
+                gameView.flashNewTile(board.getLastAddedPos());
+                
+                try {
+                    Thread.sleep(300); // Vänta 1 sekund (kan ändras för att passa spelets tempo)
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
+                this.animationInProgress = false;
+                gameView.posToFlash = null; // Återställ flagga direkt (kan ändras för att vänta på animation) 
                 // Uppdatera vy och kontrollera spelöver
                 updateGameView();
                 if (board.isGameOver()) {
@@ -218,5 +238,40 @@ public class GameController {
              JOptionPane.showMessageDialog(mainFrame, "Could not load game state: " + e.getMessage(), "Load Error", JOptionPane.ERROR_MESSAGE);
         }
          gameView.requestFocusInWindow(); // Återställ fokus
+    }
+
+    public void toggleAutoPlay() {
+        if (autoPlayer == null) {
+            // Starta AutoPlayer
+            autoPlayer = new AutoPlayerStrategy() {
+                @Override
+                public void run() {
+                    while (!Thread.currentThread().isInterrupted()) {
+
+                        try {
+                            // Vänta en sekund mellan drag
+                            Thread.sleep(1000); // Justera tiden för att passa spelets tempo
+                            int[] directions = new int[]{KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT};
+                            // Välj ett slumpmässigt drag
+                            int randomDirection = directions[(int) (Math.random() * directions.length)];
+                            // Anropa handleKeyPress med det slumpmässiga draget
+                            handleKeyPress(randomDirection);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                }
+            };
+            autoPlayer.start(); // Startar tråden
+            System.out.println("Auto Play started.");
+            JOptionPane.showMessageDialog(mainFrame, "Auto Play started. Press 'A' again to stop.", "Auto Play", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            // Stoppa AutoPlayer
+            autoPlayer.interrupt(); // Avbryt tråden
+            autoPlayer = null;
+            System.out.println("Auto Play stopped.");
+            JOptionPane.showMessageDialog(mainFrame, "Auto Play stopped.", "Auto Play", JOptionPane.INFORMATION_MESSAGE);
+        }
+        gameView.requestFocusInWindow(); // Återställ fokus
     }
 }

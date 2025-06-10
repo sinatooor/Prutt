@@ -12,6 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
         // Kör GUI-skapandet på Event Dispatch Thread (EDT) - viktigt för Swing!
+        //Swing är inte trådsäker. Det betyder att om flera trådar försöker ändra på t.ex. knappar, fönster eller etiketter samtidigt, kan det uppstå grafiska fel eller krascher.
         SwingUtilities.invokeLater(() -> {
             createAndShowGUI();
         });
@@ -41,12 +42,14 @@ public class Main {
         JButton saveButton = new JButton("Save (S)");
         JButton loadButton = new JButton("Load (L)");
         JButton scoresButton = new JButton("High Scores");
+        JButton autoPlayButton = new JButton("Auto Play (A)"); // Ny knapp för Auto Play
 
         buttonPanel.add(restartButton);
         buttonPanel.add(undoButton);
         buttonPanel.add(saveButton);
         buttonPanel.add(loadButton);
         buttonPanel.add(scoresButton);
+        buttonPanel.add(autoPlayButton);
 
         // Lägg till ActionListeners för knapparna
         restartButton.addActionListener(e -> gameController.restartGame());
@@ -54,6 +57,7 @@ public class Main {
         saveButton.addActionListener(e -> gameController.saveGame());
         loadButton.addActionListener(e -> gameController.loadGame());
         scoresButton.addActionListener(e -> gameController.showHighScores());
+        autoPlayButton.addActionListener(e -> gameController.toggleAutoPlay());
 
 
         // Sätt layout för fönstret (BorderLayout är enkel)
@@ -69,6 +73,8 @@ public class Main {
         // Initialisera controllern (koppla KeyListener etc.)
         // Måste göras *efter* att komponenterna lagts till i fönstret
         gameController.initialize(frame, scoreLabel);
+        //Detta är ett kritiskt steg där controllern får referenser till fönstret och poäng-etiketten och viktigast av allt,
+        // kopplar på en KeyListener. Det är denna KeyListener som lyssnar efter piltryckningar.
 
         // Anpassa fönstrets storlek till innehållet
         frame.pack();
@@ -78,6 +84,8 @@ public class Main {
         frame.setVisible(true);
 
          // Försök sätta fokus på spelpanelen direkt när fönstret visas
+         //så att den kan ta emot tangentbordsinmatning.
+         // Detta är viktigt för att KeyListener ska fungera direkt.
          gameView.requestFocusInWindow();
     }
 }

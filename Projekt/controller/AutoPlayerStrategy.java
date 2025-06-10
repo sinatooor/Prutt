@@ -10,9 +10,24 @@ import java.util.Random;
 
 // Ett interface eller abstrakt klass kan användas för flera strategier.
 // Här är ett enkelt exempel på en konkret slumpmässig strategi.
-public class AutoPlayerStrategy {
+public class AutoPlayerStrategy extends Thread{
 
     private Random random = new Random();
+
+    public void run() {
+        // Denna tråd kommer att köra automatiskt när den startas.
+        // Här kan du implementera en loop som väljer drag med jämna mellanrum.
+        // T.ex.:
+        while (true) {
+            try {
+                Thread.sleep(1000); // Vänta 1 sekund mellan drag
+                
+            } catch (InterruptedException e) {
+                break; // Avbryt loopen om tråden avbryts
+            }
+            // Här skulle du anropa chooseMove() och utföra det draget på brädet.
+        }
+    }
 
     /**
      * Väljer ett slumpmässigt, giltigt drag för det givna brädet.
@@ -20,7 +35,7 @@ public class AutoPlayerStrategy {
      * @param board Det nuvarande spelbrädet.
      * @return En slumpmässig giltig Direction, eller null om inga drag är möjliga.
      */
-    public Direction chooseMove(Board board) {
+    public Direction chooseMove(Board board, GameController gameController) {
         List<Direction> possibleMoves = new ArrayList<>();
 
         // Testa alla fyra riktningar

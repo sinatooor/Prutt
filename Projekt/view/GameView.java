@@ -1,5 +1,6 @@
 package view;
 
+import model.Board.Position;
 import model.Board;
 import model.Tile;
 
@@ -14,8 +15,10 @@ public class GameView extends JPanel {
     private static final int TILE_SIZE = 100; // Storlek på varje bricka i pixlar
     private static final int GAP = 10; // Mellanrum mellan brickor
     private static final int ARC_SIZE = 10; // Hur runda hörnen ska vara
-
+    
     private Board board; // Referens till spelbrädet för att kunna rita
+
+    public Position posToFlash;
 
     // === Färger för rosa/lila tema ===
     private static final Color GAME_BACKGROUND_COLOR = new Color(0xC8A2C8); // Lila (Lilac)
@@ -110,8 +113,15 @@ public class GameView extends JPanel {
                     String text = String.valueOf(value);
 
                     // Hämta färger
-                    Color tileColor = TILE_COLORS.getOrDefault(value, DEFAULT_TILE_COLOR);
+                    Color tileColor;
                     Color textColor = TEXT_COLORS.getOrDefault(value, LIGHT_TEXT_COLOR);
+
+                    if (posToFlash != null && posToFlash.row == r && posToFlash.col == c) {
+                        tileColor = Color.WHITE; // Välj en färg för "flashen", t.ex. vit
+                    } else {
+                        // Annars, använd den vanliga färgen
+                        tileColor = TILE_COLORS.getOrDefault(value, DEFAULT_TILE_COLOR);
+                    }
 
                     // Rita brickans bakgrund
                     g2d.setColor(tileColor);
@@ -188,6 +198,11 @@ public class GameView extends JPanel {
         else if (value >= 16) fontSize = 40;
         else fontSize = 45; // Störst font för 1-2 siffror
         return new Font("Arial", Font.BOLD, fontSize);
+    }
+
+    public void flashNewTile(Position pos) {
+        this.posToFlash = pos;
+        repaint();
     }
 
 } // Slut på GameView klassen

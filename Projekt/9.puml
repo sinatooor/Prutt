@@ -1,0 +1,108 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+hide empty members
+
+package "Model" {
+  class Board {
+    + SIZE : int
+    - grid : Tile[][]
+    - score : int
+    + move(Direction) : boolean
+    + addRandomTile() : boolean
+    + isGameOver() : boolean
+    + reset()
+    + getState() : GameState
+    + setState(GameState)
+  }
+
+  class Tile {
+    - value : int
+    + getValue() : int
+  }
+
+  enum Direction {
+    UP, DOWN, LEFT, RIGHT
+    + getDeltaRow() : int
+    + getDeltaCol() : int
+  }
+
+  class GameState {
+    - grid : Tile[][]
+    - score : int
+  }
+  
+  class HighScoreManager {
+    - highScores : List<ScoreEntry>
+    + addScore(int, String)
+    + isHighScore(int) : boolean
+    + getHighScores() : List<ScoreEntry>
+  }
+  
+  class "HighScoreManager.ScoreEntry" as ScoreEntry {
+     - score : int
+     - name : String
+  }
+}
+
+package "View" {
+  class GameView extends JPanel {
+    - board : Board
+    + setBoard(Board)
+    # paintComponent(Graphics)
+  }
+}
+
+package "Controller" {
+  class GameController {
+    - board : Board
+    - gameView : GameView
+    - highScoreManager : HighScoreManager
+    - history : Stack<GameState>
+    + initialize(JFrame, JLabel)
+    - handleKeyPress(int)
+    + restartGame()
+    + undoMove()
+    + saveGame()
+    + loadGame()
+  }
+  
+  class AutoPlayerStrategy {
+    + chooseMove(Board) : Direction
+  }
+}
+
+package "Main" {
+  class Main {
+    + main(String[])
+    - createAndShowGUI()
+  }
+}
+
+
+' Relationships
+Main ..> GameController : Creates >
+Main ..> GameView : Creates >
+Main ..> Board : Creates >
+Main ..> HighScoreManager : Creates >
+
+GameController o--> Board : Has-a (controls)
+GameController o--> GameView : Has-a (updates)
+GameController o--> HighScoreManager : Has-a (uses)
+GameController ..> GameState : Uses (for history, save/load)
+GameController ..> Direction : Uses (for moves)
+
+GameView --> Board : "Knows about" (for rendering)
+' Note: In a pure MVC, View shouldn't directly know the model. 
+' Here it's a pragmatic choice for rendering performance.
+
+Board "1" *-- "0..16" Tile : Composition
+Board ..> GameState : Creates >
+Board ..> Direction : Uses
+
+AutoPlayerStrategy ..> Board : "Analyzes"
+AutoPlayerStrategy ..> Direction : "Returns"
+
+HighScoreManager "1" *-- "0..*" ScoreEntry : Composition
+
+@enduml

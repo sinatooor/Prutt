@@ -1,5 +1,6 @@
 package model;
-
+//Modellen (Board) uppdaterar sitt interna tillstånd (positionen på alla Tile-objekt) och räknar ut den nya poängen.
+//
 import java.io.Serializable; // För att kunna spara/ladda objektet
 import java.util.ArrayList;
 import java.util.Arrays; // För att kopiera arrays
@@ -13,6 +14,7 @@ public class Board implements Serializable {
     private Tile[][] grid;
     private int score;
     private Random random = new Random();
+    private Position lastAddedPos;
 
     public Board() {
         grid = new Tile[SIZE][SIZE];
@@ -55,29 +57,29 @@ public class Board implements Serializable {
 
     // Lägger till en ny bricka (2 eller 4) på en slumpmässig tom plats
     public boolean addRandomTile() {
-                // Hitta första tomma ruta högst upp till vänster
-        for (int r = 0; r < SIZE; r++) {
-            for (int c = 0; c < SIZE; c++) {
-                if (grid[r][c] == null) {
-                    grid[r][c] = new Tile(256);  // Alltid värde 4
-                    return true;
-                }
-            }
-        }
-        return false;  // Inga tomma platser
-    }
+    //             // Hitta första tomma ruta högst upp till vänster
+    //     for (int r = 0; r < SIZE; r++) {
+    //         for (int c = 0; c < SIZE; c++) {
+    //             if (grid[r][c] == null) {
+    //                 grid[r][c] = new Tile(2);  // Alltid värde 4
+    //                 return true;
+    //             }
+    //         }
+    //     }
+    //     return false;  // Inga tomma platser
+    // }
     // some changes 
 
-    //     List<Position> emptyPositions = getEmptyPositions();
-    //     if (emptyPositions.isEmpty()) {
-    //         return false; // Inga tomma platser, kan inte lägga till bricka
-    //     }
+        List<Position> emptyPositions = getEmptyPositions();
+        if (emptyPositions.isEmpty()) {
+            return false; // Inga tomma platser, kan inte lägga till bricka
+        }
 
-    //     Position randomPos = emptyPositions.get(random.nextInt(emptyPositions.size()));
-    //     int value = random.nextInt(10) == 0 ? 4 : 2; // 10% chans för 4, annars 2
-    //     grid[randomPos.row][randomPos.col] = new Tile(value);
-    //     return true;
-    // }
+        this.lastAddedPos = emptyPositions.get(random.nextInt(emptyPositions.size())); // Spara den senaste brickan som lades till
+        int value = random.nextInt(10) == 0 ? 4 : 2; // 10% chans för 4, annars 2
+        grid[lastAddedPos.row][lastAddedPos.col] = new Tile(value);
+        return true;
+    }
 
     // Returnerar en lista med koordinater för alla tomma rutor
     private List<Position> getEmptyPositions() {
@@ -256,12 +258,17 @@ public class Board implements Serializable {
 
     // Enkel intern klass för att representera en position (rad, kolumn)
     // Behöver inte vara Serializable om den bara används internt i Board.
-    private static class Position {
-        final int row;
-        final int col;
+    public static class Position {
+        final public int row;
+        final public int col;
         Position(int row, int col) {
             this.row = row;
             this.col = col;
         }
+    }
+
+    // add get function for lastAddedPos
+    public Position getLastAddedPos() {
+        return lastAddedPos; // Returnerar den senaste positionen där en bricka lades till
     }
 }
